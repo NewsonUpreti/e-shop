@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import { Gutter } from '../../_components/Gutter'
 import { Page } from '../../../payload/payload-types'
 import { Category } from '../../../payload/payload-types'
+import Categories from '../../_components/Categories'
 import { staticHome } from '../../../payload/seed/home-static'
 import { fetchDoc } from '../../_api/fetchDoc'
 import { fetchDocs } from '../../_api/fetchDocs'
@@ -25,13 +26,14 @@ export default async function Page({ params: { slug = 'home' } }) {
   const { isEnabled: isDraftMode } = draftMode()
 
   let page: Page | null = null
-
+  let categories: Category[] | null = null
   try {
     page = await fetchDoc<Page>({
       collection: 'pages',
       slug,
       draft: isDraftMode,
     })
+    categories = await fetchDocs<Category>('categories')
   } catch (error) {
     // when deploying this template on Payload Cloud, this page needs to build before the APIs are live
     // so swallow the error here and simply render the page with fallback data where necessary
@@ -57,7 +59,9 @@ export default async function Page({ params: { slug = 'home' } }) {
       {slug === 'home' ? (
         <section>
           <Hero {...hero} />
-          <Gutter>{/* categories and so on should be here */}</Gutter>
+          <Gutter className={classes.home}>
+            <Categories categories={categories} />
+          </Gutter>
         </section>
       ) : (
         <>
