@@ -1,7 +1,64 @@
-import React from 'react'
+'use client'
+import React, { useState, useEffect } from 'react'
 import classes from './index.module.scss'
 const Promotion = () => {
-  return <div>Promotion</div>
+  const [time, setTime] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  })
+
+  const targetDate = new Date()
+  targetDate.setDate(targetDate.getDate() + 3)
+
+  useEffect(() => {
+    const timerInterval = setInterval(() => {
+      const currentTime = new Date()
+      const timeDifference = Math.max(Number(targetDate) - Number(currentTime), 0)
+
+      const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24))
+      const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+      const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60))
+      const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000)
+
+      setTime({ days, hours, minutes, seconds })
+
+      if (timeDifference === 0) {
+        clearInterval(timerInterval)
+        // You can add code here to handle what happens when the target date is reached.
+      }
+    }, 1000)
+
+    return () => {
+      clearInterval(timerInterval) // Cleanup the interval when the component unmounts.
+    }
+  }, [])
+
+  return (
+    <section className={classes.promotion}>
+      <div className={classes.textBox}>
+        <h3 className={classes.title}>Deals of the week</h3>
+        <p>
+          Get ready to shop like never before with Our deal of the week. Every purchase will come
+          with exclusive perks and offers. Making you happy and full of surprises every week with
+          the trend.
+        </p>
+        <ul className={classes.stats}>
+          <StatBox label="Days" value={time.days} />
+          <StatBox label="hours" value={time.hours} />
+          <StatBox label="minutes" value={time.minutes} />
+          <StatBox label="seconds" value={time.seconds} />
+        </ul>
+      </div>
+    </section>
+  )
 }
+const StatBox = ({ label, value }: { label: string; value: number }) => (
+  <li className={classes.statBox}>
+    <h4>{value}</h4>
+    <p>{label}</p>
+  </li>
+)
 
 export default Promotion
